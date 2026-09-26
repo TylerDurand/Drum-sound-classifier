@@ -1,0 +1,31 @@
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+num = "vald"
+input_folder = os.path.join("drums", "valid")
+output_folder = num
+
+os.makedirs(output_folder, exist_ok=True)
+
+for fname in os.listdir(input_folder):
+    if fname.endswith(".wav"):
+        file_path = os.path.join(input_folder, fname)
+
+        # Load audio
+        y, sr = librosa.load(file_path, sr=22050)   # standard sampling rate
+
+        # Compute Mel spectrogram
+        mel = librosa.feature.melspectrogram(y=y, sr=sr, n_fft=2048,
+                                             hop_length=512, n_mels=128)
+        mel_db = librosa.power_to_db(mel, ref=np.max)
+
+        # Save as .png
+        plt.figure(figsize=(3, 3))
+        librosa.display.specshow(mel_db, sr=sr, hop_length=512, x_axis=None, y_axis=None)
+        plt.axis("off")
+
+        out_path = os.path.join(output_folder, fname.replace(".wav", ".png"))
+        plt.savefig(out_path, bbox_inches="tight", pad_inches=0)
+        plt.close()
